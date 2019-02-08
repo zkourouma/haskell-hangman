@@ -1,0 +1,31 @@
+name: hangman
+version: '0.1.0.0'
+category: Game
+author: Zack Kourouma
+maintainer: zack@kourouma.me
+copyright: 2018 Zack Kourouma
+license: BSD3
+homepage: https://github.com/zkourouma/haskell-hangman#readme
+extra-source-files:
+  - README.md
+  - data/dict.txt
+dependencies:
+  - base >=4.7 && <5
+  - split
+library:
+  source-dirs: src
+  exposed-modules:
+    - Dictionary
+    - Game
+  dependencies:
+    - random
+executables:
+  hangman:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - hangman
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N

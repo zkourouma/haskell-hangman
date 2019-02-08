@@ -1,23 +1,48 @@
-name:                hangman
-version:             0.1.0.0
--- synopsis:
--- description:
-homepage:            https://github.com/zkourouma/haskell-hangman#readme
-license:             BSD3
-license-file:        LICENSE
-author:              Zack Kourouma
-maintainer:          zack@kourouma.me
-copyright:           2018 Zack Kourouma
-category:            Game
-build-type:          Simple
-cabal-version:       >=1.10
-extra-source-files:  README.md
-                     , data/dict.txt
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 57008d22e3a9fe7506d03c8eea960cb47900880a27f0503007034d3c60d3f6fe
+
+name:           hangman
+version:        0.1.0.0
+category:       Game
+homepage:       https://github.com/zkourouma/haskell-hangman#readme
+author:         Zack Kourouma
+maintainer:     zack@kourouma.me
+copyright:      2018 Zack Kourouma
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    data/dict.txt
+
+library
+  exposed-modules:
+      Dictionary
+      Game
+  other-modules:
+      Paths_hangman
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , random
+    , split
+  default-language: Haskell2010
 
 executable hangman
-  hs-source-dirs:      src
-  main-is:             Main.hs
-  default-language:    Haskell2010
-  build-depends:       base >= 4.7 && < 5
-                       , random
-                       , split
+  main-is: Main.hs
+  other-modules:
+      Paths_hangman
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , hangman
+    , split
+  default-language: Haskell2010
