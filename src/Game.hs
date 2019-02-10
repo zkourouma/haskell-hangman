@@ -8,40 +8,46 @@ import           Control.Monad                  ( forever
                                                 , when
                                                 )
 import           Data.Maybe                     ( isJust )
+import           Data.List                      ( intersperse
+                                                , sort
+                                                )
 import           System.Exit                    ( exitSuccess )
 
-import           Data.List                      ( intersperse )
+guessLimit :: Int
+guessLimit = 7
 
 data Puzzle =
   Puzzle String
          [Maybe Char]
          String
+         Int
 
 instance Show Puzzle where
-  show (Puzzle _ discovered guessed) =
+  show (Puzzle _ discovered guessed guesses) =
     intersperse ' ' (fmap renderPuzzleChar discovered) ++
-    " Guesssed so far: " ++ guessed
+    " Guesssed so far: " ++ guessed ++ "\nGuesses left: " ++ show guessesLeft
+      where
+        guessesLeft = guessLimit + 1 - guesses
 
 renderPuzzleChar :: Maybe Char -> Char
 renderPuzzleChar Nothing  = '_'
 renderPuzzleChar (Just c) = c
 
 freshPuzzle :: String -> Puzzle
-freshPuzzle s = Puzzle s blanks [] where blanks = map (const Nothing) s
+freshPuzzle s = Puzzle s blanks [] 0 where blanks = map (const Nothing) s
+
 charInWord :: Puzzle -> Char -> Bool
-charInWord (Puzzle w _ _) c = c `elem` w
+charInWord (Puzzle w _ _ _) c = c `elem` w
 
 alreadyGuessed :: Puzzle -> Char -> Bool
-alreadyGuessed (Puzzle _ _ g) c = c `elem` g
+alreadyGuessed (Puzzle _ _ g _) c = c `elem` g
 
-fillInCharacter :: Puzzle -> Char -> Puzzle
-fillInCharacter (Puzzle word filledInSoFar s) c = Puzzle word
-                                                         newFilledInSoFar
-                                                         (c : s)
- where
-  zipper guessed wordChar guessedChar =
-    if wordChar == guessed then Just wordChar else guessedChar
-  newFilledInSoFar = zipWith (zipper c) word filledInSoFar
+fillInCharacter :: Puzzle -> Char -> Int -> Puzzle
+fillInCharacter (Puzzle word filledInSoFar s n) c m =
+  let zipper guessed wordChar guessedChar =
+        if wordChar == guessed then Just wordChar else guessedChar
+      newFilledInSoFar = zipWith (zipper c) word filledInSoFar
+  in  Puzzle word newFilledInSoFar (sort (c : s)) (n + m)
 
 handleGuess :: Puzzle -> Char -> IO Puzzle
 handleGuess puzzle guess = do
@@ -52,19 +58,19 @@ handleGuess puzzle guess = do
       return puzzle
     (True, _) -> do
       putStrLn "this character was in the word, filling in the word accordingly"
-      return (fillInCharacter puzzle guess)
+      return (fillInCharacter puzzle guess 0)
     (False, _) -> do
       putStrLn "this character wasnt in the word, try again"
-      return (fillInCharacter puzzle guess)
+      return (fillInCharacter puzzle guess 1)
 
 gameOver :: Puzzle -> IO ()
-gameOver (Puzzle wordToGuess _ guessed) = when (length guessed > 7) $ do
+gameOver (Puzzle wordToGuess _ _ guesses) = when (guesses > guessLimit) $ do
   putStrLn "you lose"
   putStrLn $ "the word was: " ++ wordToGuess
   exitSuccess
 
 gameWin :: Puzzle -> IO ()
-gameWin (Puzzle _ filledInSoFar _) = when (all isJust filledInSoFar) $ do
+gameWin (Puzzle _ filledInSoFar _ _) = when (all isJust filledInSoFar) $ do
   putStrLn "you win"
   exitSuccess
 
