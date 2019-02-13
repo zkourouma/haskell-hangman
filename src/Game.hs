@@ -4,14 +4,18 @@ module Game
   )
 where
 
+import           Data.Char                      ( toLower )
 import           Control.Monad                  ( forever
                                                 , when
                                                 )
-import           Data.Maybe                     ( isJust )
+import           Data.Maybe                     ( catMaybes
+                                                , isJust
+                                                )
 import           Data.List                      ( intersperse
                                                 , sort
                                                 )
 import           System.Exit                    ( exitSuccess )
+import           Dictionary                     ( randomWord )
 
 guessLimit :: Int
 guessLimit = 7
@@ -67,17 +71,27 @@ gameOver :: Puzzle -> IO ()
 gameOver (Puzzle wordToGuess _ _ guesses) = when (guesses > guessLimit) $ do
   putStrLn "you lose"
   putStrLn $ "the word was: " ++ wordToGuess
-  exitSuccess
+  playAgain
 
 gameWin :: Puzzle -> IO ()
 gameWin (Puzzle _ filledInSoFar _ _) = when (all isJust filledInSoFar) $ do
-  putStrLn "you win"
-  exitSuccess
+  putStrLn ("you win! the word was: " ++ catMaybes filledInSoFar)
+  playAgain
+
+playAgain :: IO ()
+playAgain = do
+  putStrLn "would you like to play again? [y/N]"
+  word <- randomWord
+  let newPuzzle = freshPuzzle (fmap toLower word)
+  playAgain <- getLine
+  case map toLower playAgain of
+    "y" -> runGame newPuzzle
+    _   -> exitSuccess
 
 runGame :: Puzzle -> IO ()
 runGame puzzle = forever $ do
-  gameOver puzzle
   gameWin puzzle
+  gameOver puzzle
   putStrLn $ "current puzzle is: " ++ show puzzle
   putStr "guess a letter: "
   guess <- getLine
