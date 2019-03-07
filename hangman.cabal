@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 57008d22e3a9fe7506d03c8eea960cb47900880a27f0503007034d3c60d3f6fe
+-- hash: 6a193208b9245c7c9cc34ee1c92f04e7f5cc8ed0a0d47a626ba3c2fbbfb35841
 
 name:           hangman
 version:        0.1.0.0
@@ -24,6 +24,7 @@ library
   exposed-modules:
       Dictionary
       Game
+      Puzzle
   other-modules:
       Paths_hangman
   hs-source-dirs:

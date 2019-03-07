@@ -1,13 +1,22 @@
-module Main where
+module Main
+  ( main
+  )
+where
 
 import           Data.Char                      ( toLower )
-import           Dictionary                     ( randomWord )
-import           Game                           ( freshPuzzle
-                                                , runGame
-                                                )
+import           System.Exit                    ( exitSuccess )
+import           Game                           ( play )
 
 main :: IO ()
 main = do
-  word <- randomWord
-  let puzzle = freshPuzzle (fmap toLower word)
-  runGame puzzle
+  play 0
+  playAgain
+
+
+playAgain :: IO ()
+playAgain = do
+  putStrLn "would you like to play again? [y/N]"
+  replay <- getLine
+  case map toLower replay of
+    "y" -> play 0
+    _   -> exitSuccess

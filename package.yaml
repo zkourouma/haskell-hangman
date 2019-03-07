@@ -17,6 +17,7 @@ library:
   exposed-modules:
     - Dictionary
     - Game
+    - Puzzle
   dependencies:
     - random
 executables:
